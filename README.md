@@ -11,10 +11,12 @@
 
 #### To link only a part of the repo
 
-[askubuntu link][1]
+[StackOverflow link][1]
 
 [1]: http://stackoverflow.com/questions/600079/how-do-i-clone-a-subdirectory-only-of-a-git-repository/13738951#13738951
 
+<details> 
+  <summary>Q1: What is the best Language in the World? </summary>
 ```bash
 git init <repo>
 cd <repo>
@@ -25,3 +27,4 @@ git config core.sparseCheckout true
 echo "some/dir/" >> .git/info/sparse-checkout
 echo "another/sub/tree" >> .git/info/sparse-checkout
 ```
+</details>
