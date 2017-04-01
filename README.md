@@ -7,4 +7,19 @@
 
  ```bash
  wget "google.com" -o README.md
- ```	
+ ```
+
+#### To link only a part of the repo
+[askubuntu link][1]
+[1]: http://askubuntu.com/questions/460885/how-to-clone-git-repository-only-some-directories
+
+```bash
+git init <repo>
+cd <repo>
+git remote add -f origin <url>
+
+git config core.sparseCheckout true
+
+echo "some/dir/" >> .git/info/sparse-checkout
+echo "another/sub/tree" >> .git/info/sparse-checkout
+```
