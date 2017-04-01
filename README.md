@@ -5,7 +5,7 @@
 2. Refresh page to get the latest valid token
 3. Use wget to pull the file
 
-   ```bash
+```bash
 wget "google.com" -o README.md
 ```	
   a. Rename the file
