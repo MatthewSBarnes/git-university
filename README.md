@@ -13,7 +13,7 @@
 
 [askubuntu link][1]
 
-[1]: http://askubuntu.com/questions/460885/how-to-clone-git-repository-only-some-directories
+[1]: http://stackoverflow.com/questions/600079/how-do-i-clone-a-subdirectory-only-of-a-git-repository/13738951#13738951
 
 ```bash
 git init <repo>
