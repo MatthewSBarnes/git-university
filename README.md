@@ -10,6 +10,7 @@
  ```
 
 #### To link only a part of the repo
+
 [askubuntu link][1]
 [1]: http://askubuntu.com/questions/460885/how-to-clone-git-repository-only-some-directories
 
