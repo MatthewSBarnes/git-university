@@ -8,4 +8,3 @@
  ```bash
  wget "google.com" -o README.md
  ```	
- a. Rename the file
