@@ -9,14 +9,11 @@
  wget "google.com" -o README.md
  ```
 
-#### To link only a part of the repo
+<details> 
+  <summary>**To link only a part of the repo**</summary>
 
 [StackOverflow link][1]
 
-[1]: http://stackoverflow.com/questions/600079/how-do-i-clone-a-subdirectory-only-of-a-git-repository/13738951#13738951
-
-<details> 
-  <summary>Q1: What is the best Language in the World? </summary>
 ```bash
 git init <repo>
 cd <repo>
@@ -28,3 +25,6 @@ echo "some/dir/" >> .git/info/sparse-checkout
 echo "another/sub/tree" >> .git/info/sparse-checkout
 ```
 </details>
+
+
+[1]: http://stackoverflow.com/questions/600079/how-do-i-clone-a-subdirectory-only-of-a-git-repository/13738951#13738951
