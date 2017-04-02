@@ -1,6 +1,8 @@
 ## A git repo for all of my work + projects in university
 
-#### To download a single file:
+<details>
+  <summary><b>To download a single file:</b></summary>
+
 1. View the RAW version of a file
 2. Refresh page to get the latest valid token
 3. Use wget to pull the file
@@ -9,8 +11,10 @@
  wget "google.com" -o README.md
  ```
 
+</details>
+
 <details> 
-  <summary><b>To link only a part of the repo</b></summary>
+  <summary><b>To link only a part of the repo:</b></summary>
 
 [StackOverflow link][1]
 
