@@ -10,7 +10,7 @@
  ```
 
 <details> 
-  <summary>**To link only a part of the repo**</summary>
+  <summary><b>To link only a part of the repo</b></summary>
 
 [StackOverflow link][1]
 
