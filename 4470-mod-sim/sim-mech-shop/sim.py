@@ -1,13 +1,31 @@
 # python3.6
 
+'''
+'
+' Import all of the required libraries
+'
+' simpy: Simulations in Python
+' numpy: generation of random numbers with more distributions
+' random: generation of random numbers
+' matplotlib.pyplot: used to create the graphs dynamically
+' time: for timestamp purposed
+' datetime: to convert timestamp to human readable format
+'
+' customer: user defined class for customer generator
+'
+'''
+
 import simpy
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import time
+import datetime
+
 from customer import customer
 
 NUM_CUSTOMERS = 100000000000000
-NUM_DAYS = 100
+NUM_DAYS = 4
 IAT = 10
 DAY_LENGTH = 420
 day = 0
@@ -96,5 +114,6 @@ plt.ylabel('Customers Turned Away')
 plt.xlabel('Day')
 
 plt.tight_layout()
+plt.savefig('./results/%s_graphs.png' % (datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')))
 plt.show()
 
