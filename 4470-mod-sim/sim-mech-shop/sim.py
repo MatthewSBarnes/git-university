@@ -3,15 +3,21 @@
 import simpy
 import random
 import numpy as np
+import matplotlib.pyplot as plt
 from customer import customer
 
 NUM_CUSTOMERS = 100000000000000
-NUM_DAYS = 10
+NUM_DAYS = 100
 IAT = 10
 DAY_LENGTH = 420
 day = 0
 ARR_per_day = []
 BYE_per_day = []
+days = []
+
+
+for i in range(NUM_DAYS):
+    days.append(i)
 
 def source(env, NUM_CUSTOMERS, interval, mech, DAY_LENGTH, ARR_per_day, BYE_per_day, day):
     count_ARR = 0
@@ -66,8 +72,29 @@ mech = simpy.Resource(env, capacity=3)
 env.process(source(env, NUM_CUSTOMERS, IAT, mech, DAY_LENGTH, ARR_per_day, BYE_per_day, day))
 env.run(until=DAY_LENGTH*NUM_DAYS)
 
+
+'''
+' 
+' Plot and statistic stuff
+'
+'''
+
 print('\n\nARR_PER_DAY')
 print(ARR_per_day)
 
 print('\n\nBYE_PER_DAY')
 print(BYE_per_day)
+
+plt.subplot(121)
+plt.plot(days, ARR_per_day)
+plt.ylabel('Arrivals')
+plt.xlabel('Day')
+
+plt.subplot(122)
+plt.plot(days, BYE_per_day)
+plt.ylabel('Customers Turned Away')
+plt.xlabel('Day')
+
+plt.tight_layout()
+plt.show()
+
