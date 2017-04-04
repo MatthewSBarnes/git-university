@@ -28,8 +28,8 @@ from functools import partial, wraps
 
 from customer import customer
 
-NUM_CUSTOMERS = 10
-NUM_DAYS = 1
+NUM_CUSTOMERS = 100000
+NUM_DAYS = 100
 IAT = 10
 DAY_LENGTH = 420
 ARR_per_day = []
@@ -92,7 +92,8 @@ def joblength():
 '''
 
 def patch_resource(resource, pre=None, post=None):
-    """Patch *resource* so that it calls the callable *pre* before each
+    """
+    Patch *resource* so that it calls the callable *pre* before each
     put/get/request/release operation and the callable *post* after each
     operation.  The only argument to these functions is the resource
     instance.
@@ -101,19 +102,23 @@ def patch_resource(resource, pre=None, post=None):
         # Generate a wrapper for put/get/request/release
         @wraps(func)
         def wrapper(*args, **kwargs):
+
+            #print(func)
+            #print(name)
+
             # This is the actual wrapper
             # Call "pre" callback
             if pre:
                 pre(resource)
 
-            ''' NO PRE SO PRE WONT BE CALLED '''
+            """ NO PRE SO PRE WONT BE CALLED """
                 
-            ''' DO THE MECH OP '''
+            """ DO THE MECH OP """
             
             # Perform actual operation
             ret = func(*args, **kwargs)
             
-            ''' POST CALLBACK '''
+            """ POST CALLBACK """
 
             # Call "post" callback
             if post:
@@ -122,16 +127,27 @@ def patch_resource(resource, pre=None, post=None):
             return ret
         return wrapper
                 
-        # Replace the original operations with our wrapper
-    for name in ['put', 'get', 'request', 'release']:
+    # Replace the original operations with our wrapper
+    for name in ['put', 'get', 'request', 'release']: 
         if hasattr(resource, name):
             setattr(resource, name, get_wrapper(getattr(resource, name)))
 
 
-
-def monitor(data, resource):
+def premonitor(data, resource):
     """This is our monitoring callback."""
     item = (
+        'pre',
+        math.floor(resource._env.now),  # The current simulation time
+        resource.count,  # The number of users 
+        len(resource.queue),  # The number of queued processes
+    )
+    data.append(item)
+
+
+def postmonitor(data, resource):
+    """This is our monitoring callback."""
+    item = (
+        'post',
         math.floor(resource._env.now),  # The current simulation time
         resource.count,  # The number of users 
         len(resource.queue),  # The number of queued processes
@@ -142,20 +158,21 @@ env = simpy.Environment()
 mech = simpy.Resource(env, capacity=3)
 
 '''
-' BEGIN MONKEY PATCH
-' Monkey patch the mech resource for monitoring state changes
+BEGIN MONKEY PATCH
+Monkey patch the mech resource for monitoring state changes
 '''
 
 data = []
-# Bind *data* as first argument to monitor()
+#Bind *data* as first argument to monitor()
 
-monitor = partial(monitor, data)
-patch_resource(mech, post=monitor)  # Patches (only) this resource instance
-
+premonitor = partial(premonitor, data)
+postmonitor = partial(postmonitor, data)
+patch_resource(mech, post=postmonitor)  # Patches (only) this resource instance
 
 '''
-' END MONKEY PATCH
-''' 
+END MONKEY PATCH
+'''
+
 env.process(source(env, NUM_CUSTOMERS, IAT, mech, DAY_LENGTH, ARR_per_day, BYE_per_day))
 env.run(until=DAY_LENGTH*NUM_DAYS)
 
@@ -170,25 +187,83 @@ env.run(until=DAY_LENGTH*NUM_DAYS)
 for i in range(len(ARR_per_day)):
     days.append(i)
 
+# The data in a list.
+#print(days)
 print('\n\nARR_PER_DAY')
 print(ARR_per_day)
-
 print('\n\nBYE_PER_DAY')
 print(BYE_per_day)
 
+# Create the plots
+# ARR chart
 plt.subplot(121)
 plt.plot(days, ARR_per_day)
 plt.ylabel('Arrivals')
 plt.xlabel('Day')
 
+# BYE chart
 plt.subplot(122)
 plt.plot(days, BYE_per_day)
 plt.ylabel('Customers Turned Away')
 plt.xlabel('Day')
 
+# Fix Layout, save, and show graphs
 plt.tight_layout()
 plt.savefig('./results/%s_graphs.png' % (datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')))
 plt.show()
 
-print(data)
+massaged_data = []
 
+# Massage the resource release times
+#print('Pre-Massaged data')
+#print(len(data))
+#print(data)
+#print('Massaging data')
+
+for i in range(len(data)):
+#    print(i)
+#    print(data[i][1]) # env.now
+#    print(data[i][2]) # number of users of resource
+#    print(data[i][3]) # number in queue for resource
+    if (data[i][2] < 3 and data[i][3] > 0):
+#        print('if')
+#        print(i)
+        temp3 = int(data[i][3])
+        temp2 = int(data[i][2])
+        #print('if\t%d' % temp2)
+        #print('if\t%d' % temp3)
+        while ((temp2 < 3) and (temp3 > 0)):
+            #print('while')
+            #print(temp2)
+            #print(temp3)
+            temp3 -= 1
+            temp2 += 1
+    else:
+        temp3 = data[i][3]
+        temp2 = data[i][2]
+    new_item = [data[i][0], data[i][1], temp2, temp3]
+    massaged_data.append(new_item)
+
+#print(massaged_data)
+
+in_queue = 0
+total_delay = 0
+total_delay_per_day = []
+current_day = 0
+
+#print('len(massaged_data): %d' % len(massaged_data))
+for i in range(len(massaged_data)-1):
+    total_delay += ( massaged_data[i+1][1] - massaged_data[i][1] ) * massaged_data[i][3]
+    if ((math.floor(massaged_data[i+1][1] / DAY_LENGTH ) > current_day) or (i == len(massaged_data) - 2 )):
+        current_day += 1
+        total_delay_per_day.append(total_delay)
+        total_delay = 0
+
+print('total_delay_per_day:')
+print(total_delay_per_day)
+
+plt.subplot(111)
+plt.plot(days, total_delay_per_day)
+plt.ylabel('Total Delay per Day')
+plt.xlabel('Day')
+plt.show()
