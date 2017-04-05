@@ -196,20 +196,22 @@ print(BYE_per_day)
 
 # Create the plots
 # ARR chart
-plt.subplot(121)
+plt.subplot(111)
 plt.plot(days, ARR_per_day)
 plt.ylabel('Arrivals')
 plt.xlabel('Day')
+plt.savefig('./results/%s_figure_ARR.png' % (datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')))
+plt.show()
 
 # BYE chart
-plt.subplot(122)
+plt.subplot(111)
 plt.plot(days, BYE_per_day)
 plt.ylabel('Customers Turned Away')
 plt.xlabel('Day')
 
 # Fix Layout, save, and show graphs
-plt.tight_layout()
-plt.savefig('./results/%s_graphs.png' % (datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')))
+# plt.tight_layout()
+plt.savefig('./results/%s_figure_BYE.png' % (datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')))
 plt.show()
 
 massaged_data = []
@@ -259,11 +261,12 @@ for i in range(len(massaged_data)-1):
         total_delay_per_day.append(total_delay)
         total_delay = 0
 
-print('total_delay_per_day:')
-print(total_delay_per_day)
+#print('total_delay_per_day:')
+#print(total_delay_per_day)
 
 plt.subplot(111)
 plt.plot(days, total_delay_per_day)
 plt.ylabel('Total Delay per Day')
 plt.xlabel('Day')
+plt.savefig('./results/%s_figure_DEL.png' % (datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')))
 plt.show()
