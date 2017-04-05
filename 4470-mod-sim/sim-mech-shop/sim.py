@@ -29,16 +29,19 @@ from functools import partial, wraps
 from customer import customer
 
 NUM_CUSTOMERS = 100000
-NUM_DAYS = 100
+NUM_DAYS = 50
 IAT = 10
 DAY_LENGTH = 420
 ARR_per_day = []
 BYE_per_day = []
 days = []
-
-
+W = []
+X = []
+Y = []
+Z = []
+w = x = y = z =1
 # generates customers randomly
-def source(env, NUM_CUSTOMERS, interval, mech, DAY_LENGTH, ARR_per_day, BYE_per_day):
+def source(env, NUM_CUSTOMERS, interval, mech, DAY_LENGTH, ARR_per_day, BYE_per_day, w, x, y, z):
     count_ARR = 0
     count_BYE = 0
     
@@ -46,7 +49,8 @@ def source(env, NUM_CUSTOMERS, interval, mech, DAY_LENGTH, ARR_per_day, BYE_per_
         count_ARR += 1
         
         #create a joblength with a uniform distribution of being job_length +/- 5
-        job_duration = joblength()
+        job = gen_job() 
+        job_duration, w, x, y, z = joblength(job, w, x, y, z)
         job_duration = np.random.uniform(job_duration - 5, job_duration + 5,)
 
         time_of_day = env.now % DAY_LENGTH
@@ -67,24 +71,35 @@ def source(env, NUM_CUSTOMERS, interval, mech, DAY_LENGTH, ARR_per_day, BYE_per_
         if ((env.now % DAY_LENGTH) + t > DAY_LENGTH):
             ARR_per_day.append(count_ARR)
             BYE_per_day.append(count_BYE)
+            W.append(w)
+            X.append(x)
+            Y.append(y)
+            Z.append(z)
             # reset daily variables, and increment day counter
             count_ARR = 0
             count_BYE = 0
+            w = x = y = z = 0
         
         yield env.timeout(t)
 
 
-def joblength():
-    n = random.randint(0,3)
-    if (n == 0):
-        return 15
-    elif (n == 1):
-        return 20
-    elif (n == 2):
-        return 25
-    else:
-        return 30
+def gen_job():
+    return random.randint(0,3)
 
+def joblength(n, w, x, y, z):
+    if (n == 0):
+        j = 15
+        w += 1
+    elif (n == 1):
+        j = 20
+        x += 1
+    elif (n == 2):
+        j = 25
+        y += 1
+    else:
+        j = 30
+        z += 1
+    return j, w, x, y, z
 '''
 '
 ' MONKEY PATCH MECH RESOURCE METHODS
@@ -173,7 +188,7 @@ patch_resource(mech, post=postmonitor)  # Patches (only) this resource instance
 END MONKEY PATCH
 '''
 
-env.process(source(env, NUM_CUSTOMERS, IAT, mech, DAY_LENGTH, ARR_per_day, BYE_per_day))
+env.process(source(env, NUM_CUSTOMERS, IAT, mech, DAY_LENGTH, ARR_per_day, BYE_per_day, w, x, y, z))
 env.run(until=DAY_LENGTH*NUM_DAYS)
 
 
@@ -265,12 +280,12 @@ for i in range(len(massaged_data)-1):
 #print('total_delay_per_day:')
 #print(total_delay_per_day)
 
-plt.subplot(111)
-plt.plot(days, total_delay_per_day)
-plt.ylabel('Total Delay per Day')
-plt.xlabel('Day')
-plt.savefig('./results/%s_figure_DEL.png' % (time_stamp))
-plt.show()
+#plt.subplot(111)
+#plt.plot(days, total_delay_per_day)
+#plt.ylabel('Total Delay per Day')
+#plt.xlabel('Day')
+#plt.savefig('./results/%s_figure_DEL.png' % (time_stamp))
+#plt.show()
 
 avg_delay_per_day = []
 for i in range(len(total_delay_per_day)):
@@ -282,3 +297,28 @@ plt.ylabel('Average Delay per Day')
 plt.xlabel('Day')
 plt.savefig('./results/%s_figure_AVGDEL.png' % (time_stamp))
 plt.show()
+
+
+# Show both BYE and ARR per day
+plt.subplot(111)
+plt.plot(days, ARR_per_day)
+plt.plot(days, BYE_per_day)
+plt.show()
+
+
+#print(W)
+#print(X)
+#print(Y)
+#print(Z)
+#fig, ax = plt.subplots(111)
+plt.subplot(111)
+plt.plot(days, W, label='Number of Job 0')
+plt.plot(days, X, label='Number of Job 1')
+plt.plot(days, Y, label='Number of Job 2')
+plt.plot(days, Z, label='Number of Job 3')
+plt.xlabel('Day')
+plt.ylabel('Number of Job Per day')
+#ax.xaxis.set_major_locator(days)
+plt.legend()
+plt.show()
+
