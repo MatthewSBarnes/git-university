@@ -41,8 +41,10 @@ X = []
 Y = []
 Z = []
 w = x = y = z = 1
+total_job_time = 0
+
 # generates customers randomly
-def source(env, NUM_CUSTOMERS, interval, mech, DAY_LENGTH, ARR_per_day, BYE_per_day, w, x, y, z):
+def source(env, NUM_CUSTOMERS, interval, mech, DAY_LENGTH, ARR_per_day, BYE_per_day, w, x, y, z, total_job_time):
     count_ARR = 0
     count_BYE = 0
     
@@ -62,6 +64,7 @@ def source(env, NUM_CUSTOMERS, interval, mech, DAY_LENGTH, ARR_per_day, BYE_per_
 
         else:
             c = customer(env, 'Customer %05d' % i, mech, DAY_LENGTH, job_duration, status=0)
+            total_job_time += job_duration
 
         env.process(c)
 
@@ -189,7 +192,7 @@ patch_resource(mech, post=postmonitor)  # Patches (only) this resource instance
 END MONKEY PATCH
 '''
 
-env.process(source(env, NUM_CUSTOMERS, IAT, mech, DAY_LENGTH, ARR_per_day, BYE_per_day, w, x, y, z))
+env.process(source(env, NUM_CUSTOMERS, IAT, mech, DAY_LENGTH, ARR_per_day, BYE_per_day, w, x, y, z, total_job_time))
 env.run(until=DAY_LENGTH*NUM_DAYS)
 print('\n  Simulation Finished!')
 
@@ -337,3 +340,6 @@ plt.savefig('./results/%s_figure_JOBPDAY.png' % (time_stamp))
 if (SHOW_GRAPHS == 1 ):
     plt.show()
 plt.close()
+
+print('OTIS')
+print(total_job_time+sum(total_delay_per_day))
