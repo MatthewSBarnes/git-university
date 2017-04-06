@@ -214,7 +214,7 @@ print('\n\n  ===============================\t\t\t\t\t\t======================='
 print('          Some Statistics        \t\t\t\t\t\t        Authors')
 print('  ===============================\t\t\t\t\t\t=======================\n\n')
 print('  Number of Days within Simulation: %d\t\t\t\t\t Matthew Barnes + Yashar Morabbi Heravi' % (NUM_DAYS))
-print('  Hours per Day: %d\n' % DAY_LENGTH)
+print('  Minutes per Day: %d\n' % DAY_LENGTH)
 
 print('  Average number of times Job 0 was requested: %d' % (sum(W)/NUM_DAYS))
 print('  Average number of times Job 1 was requested: %d' % (sum(X)/NUM_DAYS))
