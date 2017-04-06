@@ -30,6 +30,7 @@ from customer import customer
 
 NUM_CUSTOMERS = 100000
 NUM_DAYS = 50
+SHOW_GRAPHS = 0
 IAT = 10
 DAY_LENGTH = 420
 ARR_per_day = []
@@ -39,7 +40,7 @@ W = []
 X = []
 Y = []
 Z = []
-w = x = y = z =1
+w = x = y = z = 1
 # generates customers randomly
 def source(env, NUM_CUSTOMERS, interval, mech, DAY_LENGTH, ARR_per_day, BYE_per_day, w, x, y, z):
     count_ARR = 0
@@ -190,7 +191,7 @@ END MONKEY PATCH
 
 env.process(source(env, NUM_CUSTOMERS, IAT, mech, DAY_LENGTH, ARR_per_day, BYE_per_day, w, x, y, z))
 env.run(until=DAY_LENGTH*NUM_DAYS)
-
+print('\n  Simulation Finished!')
 
 '''
 ' 
@@ -204,56 +205,66 @@ for i in range(len(ARR_per_day)):
 
 # The data in a list.
 #print(days)
-print('\n\nARR_PER_DAY')
-print(ARR_per_day)
-print('\n\nBYE_PER_DAY')
-print(BYE_per_day)
+#print('\n\nARR_PER_DAY')
+#print(ARR_per_day)
+#print('\n\nBYE_PER_DAY')
+#print(BYE_per_day)
+
+print('\n\n  ===============================\t\t\t\t\t\t=======================')
+print('          Some Statistics        \t\t\t\t\t\t        Authors')
+print('  ===============================\t\t\t\t\t\t=======================\n\n')
+print('  Number of Days within Simulation: %d\t\t\t\t\t Matthew Barnes + Yashar Morabbi Heravi' % (NUM_DAYS))
+print('  Hours per Day: %d\n' % DAY_LENGTH)
+
+print('  Average number of times Job 0 was requested: %d' % (sum(W)/NUM_DAYS))
+print('  Average number of times Job 1 was requested: %d' % (sum(X)/NUM_DAYS))
+print('  Average number of times Job 2 was requested: %d' % (sum(Y)/NUM_DAYS))
+print('  Average number of times Job 3 was requested: %d\n\n' % (sum(Z)/NUM_DAYS))
+
+print('  Graphs are saved to the ./results/ directory\n\n')
+
 
 # Create the plots
 time_stamp = (datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
 # ARR chart
+fig_size = plt.rcParams["figure.figsize"]
+fig_size[0] = 12
+fig_size[1] = 9
+plt.rcParams["figure.figsize"] = fig_size
 plt.subplot(111)
 plt.plot(days, ARR_per_day)
 plt.ylabel('Arrivals')
 plt.xlabel('Day')
+plt.title('Arrivals per Day')
+fig = plt.gcf()
+fig.canvas.set_window_title('Graph - Number of Arrivals per Day')
+fig.set_figwidth(128)
 plt.savefig('./results/%s_figure_ARR.png' % (time_stamp))
-plt.show()
+if (SHOW_GRAPHS == 1 ):
+    plt.show()
 
 # BYE chart
 plt.subplot(111)
 plt.plot(days, BYE_per_day)
 plt.ylabel('Customers Turned Away')
 plt.xlabel('Day')
+plt.title('Customers Turned Away per Day')
+fig = plt.gcf()
+fig.canvas.set_window_title('Graph - Number of Customers Turned Away per Day')
 
 # Fix Layout, save, and show graphs
 # plt.tight_layout()
 plt.savefig('./results/%s_figure_BYE.png' % (time_stamp))
-plt.show()
+if (SHOW_GRAPHS == 1 ):
+    plt.show()
 
 massaged_data = []
 
-# Massage the resource release times
-#print('Pre-Massaged data')
-#print(len(data))
-#print(data)
-#print('Massaging data')
-
 for i in range(len(data)):
-#    print(i)
-#    print(data[i][1]) # env.now
-#    print(data[i][2]) # number of users of resource
-#    print(data[i][3]) # number in queue for resource
     if (data[i][2] < 3 and data[i][3] > 0):
-#        print('if')
-#        print(i)
         temp3 = int(data[i][3])
         temp2 = int(data[i][2])
-        #print('if\t%d' % temp2)
-        #print('if\t%d' % temp3)
         while ((temp2 < 3) and (temp3 > 0)):
-            #print('while')
-            #print(temp2)
-            #print(temp3)
             temp3 -= 1
             temp2 += 1
     else:
@@ -262,14 +273,11 @@ for i in range(len(data)):
     new_item = [data[i][0], data[i][1], temp2, temp3]
     massaged_data.append(new_item)
 
-#print(massaged_data)
-
 in_queue = 0
 total_delay = 0
 total_delay_per_day = []
 current_day = 0
 
-#print('len(massaged_data): %d' % len(massaged_data))
 for i in range(len(massaged_data)-1):
     total_delay += ( massaged_data[i+1][1] - massaged_data[i][1] ) * massaged_data[i][3]
     if ((math.floor(massaged_data[i+1][1] / DAY_LENGTH ) > current_day) or (i == len(massaged_data) - 2 )):
@@ -277,15 +285,13 @@ for i in range(len(massaged_data)-1):
         total_delay_per_day.append(total_delay)
         total_delay = 0
 
-#print('total_delay_per_day:')
-#print(total_delay_per_day)
-
 #plt.subplot(111)
 #plt.plot(days, total_delay_per_day)
 #plt.ylabel('Total Delay per Day')
 #plt.xlabel('Day')
 #plt.savefig('./results/%s_figure_DEL.png' % (time_stamp))
-#plt.show()
+#if (SHOW_GRAPHS == 1 ):
+#    plt.show()
 
 avg_delay_per_day = []
 for i in range(len(total_delay_per_day)):
@@ -293,32 +299,37 @@ for i in range(len(total_delay_per_day)):
 
 plt.subplot(111)
 plt.plot(days, avg_delay_per_day)
-plt.ylabel('Average Delay per Day')
+plt.ylabel('Average Delay')
 plt.xlabel('Day')
+plt.title('Average Delay per Day')
+fig = plt.gcf()
+fig.canvas.set_window_title('Graph - Average Delay per Day')
 plt.savefig('./results/%s_figure_AVGDEL.png' % (time_stamp))
-plt.show()
+if (SHOW_GRAPHS == 1 ):
+    plt.show()
 
 
 # Show both BYE and ARR per day
-plt.subplot(111)
-plt.plot(days, ARR_per_day)
-plt.plot(days, BYE_per_day)
-plt.show()
+#plt.subplot(111)
+#plt.plot(days, ARR_per_day)
+#plt.plot(days, BYE_per_day)
+#plt.show()
 
-
-#print(W)
-#print(X)
-#print(Y)
-#print(Z)
-#fig, ax = plt.subplots(111)
 plt.subplot(111)
-plt.plot(days, W, label='Number of Job 0')
-plt.plot(days, X, label='Number of Job 1')
-plt.plot(days, Y, label='Number of Job 2')
-plt.plot(days, Z, label='Number of Job 3')
+
+plt.plot(days, W, label='Windshield Repair j0')
+plt.plot(days, X, label='Oil Change j1')
+plt.plot(days, Y, label='Tire Change j2')
+plt.plot(days, Z, label='Detailing j3')
+
 plt.xlabel('Day')
-plt.ylabel('Number of Job Per day')
-#ax.xaxis.set_major_locator(days)
-plt.legend()
-plt.show()
+plt.ylabel('Number of Jobs')
+plt.title('Number of Jobs per Day')
+fig = plt.gcf()
+fig.canvas.set_window_title('Graph - Number of Jobs per Day')
 
+plt.tight_layout()
+plt.legend()
+plt.savefig('./results/%s_figure_JOBPDAY.png' % (time_stamp))
+if (SHOW_GRAPHS == 1 ):
+    plt.show()
