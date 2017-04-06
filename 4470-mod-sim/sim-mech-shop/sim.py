@@ -238,10 +238,11 @@ plt.xlabel('Day')
 plt.title('Arrivals per Day')
 fig = plt.gcf()
 fig.canvas.set_window_title('Graph - Number of Arrivals per Day')
-fig.set_figwidth(128)
 plt.savefig('./results/%s_figure_ARR.png' % (time_stamp))
 if (SHOW_GRAPHS == 1 ):
     plt.show()
+plt.close()
+
 
 # BYE chart
 plt.subplot(111)
@@ -257,6 +258,7 @@ fig.canvas.set_window_title('Graph - Number of Customers Turned Away per Day')
 plt.savefig('./results/%s_figure_BYE.png' % (time_stamp))
 if (SHOW_GRAPHS == 1 ):
     plt.show()
+plt.close()
 
 massaged_data = []
 
@@ -292,6 +294,7 @@ for i in range(len(massaged_data)-1):
 #plt.savefig('./results/%s_figure_DEL.png' % (time_stamp))
 #if (SHOW_GRAPHS == 1 ):
 #    plt.show()
+#plt.close()
 
 avg_delay_per_day = []
 for i in range(len(total_delay_per_day)):
@@ -307,7 +310,7 @@ fig.canvas.set_window_title('Graph - Average Delay per Day')
 plt.savefig('./results/%s_figure_AVGDEL.png' % (time_stamp))
 if (SHOW_GRAPHS == 1 ):
     plt.show()
-
+plt.close()
 
 # Show both BYE and ARR per day
 #plt.subplot(111)
@@ -333,3 +336,4 @@ plt.legend()
 plt.savefig('./results/%s_figure_JOBPDAY.png' % (time_stamp))
 if (SHOW_GRAPHS == 1 ):
     plt.show()
+plt.close()
