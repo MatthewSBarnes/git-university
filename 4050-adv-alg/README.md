@@ -1,5 +1,5 @@
-#### Advanced Algorithms 4050
-*If there is a file with the name "not-valid" in the front, that means that this file is not complete, or does not work properly.
+### Advanced Algorithms 4050
+__If there is a file with the name "not-valid" in the front, that means that this file is not complete, or does not work properly.__
 
 
 These are projects that were completed for assignments in the Advanced Algorithms class
